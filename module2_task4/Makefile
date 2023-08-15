@@ -1,4 +1,4 @@
-DESTDIR=./public
+DESTDIR=dist
 HUGO_EXECUTABLE := hugo
 
 help: ## command help
