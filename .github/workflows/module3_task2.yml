@@ -1,47 +1,50 @@
 ---
-# Workflow name
 name: module3_task2
-# action who declench workflow
+
 "on":
   push:
     branches:
-      - main
-  # programmate time of workflow execution
+      - 'master'
+
   schedule:
-    - cron: '0 0 * * *'
+    - cron: "30 10 * * *"
 
-# all action in this workflow
 jobs:
-  builds:
-    # name of job
-    name: up-to-date installation system
-    # env of execution
+  build:
     runs-on: ubuntu-22.04
-
     steps:
-      - uses: actions/checkout@v3
+      - name: Clone the repo
+        uses: actions/checkout@v3
+        with:
+          repository: ''
 
-      - name: installation Hugo with script
-        run: cd module3_task2 && ./setup.sh
+      - name: Running the setup
+        run: ./module3_task2/setup.sh
 
-      - name: Validate Makefile execution make build command
+      - name: Building
+        run: cd module3_task2/ && make build
+
+      - name: Run api
+        run: cd module3_task2/ && make run
+
+      - name: Create a test post
         run: |
-          make help
-          make build
-          make lint
-          make run
-          make stop
-          make clean
-        working-directory: module3_task2
+          cd module3_task2/ &&
+          POST_TITLE=welcometest POST_NAME=testing make post
 
-      - name: packaging
-        run: cd module3_task2 && make package
+      - name: Testing
+        run: cd module3_task2/ && make test
 
-      - name: tests
-        run: |
-          cd module3_task2/ && make test
-      - name: archieve ZIP file artifact only if all tests sucess
-        if: ${{github.ref=='refs/heads/main'}}
+      - name: Cleaning
+        run: cd module3_task2/ && make clean
+
+      - name: Linter
+        run: cd module3_task2/ && make lint
+
+      - name: Packaging
+        run: cd module3_task2/ && make package
+
+      - name: Archive production artifacts
         uses: actions/upload-artifact@v3
         with:
           name: Saving the zip file

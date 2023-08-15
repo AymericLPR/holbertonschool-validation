@@ -1,32 +1,36 @@
 ---
-# Workflow name
 name: module3_task1
-# action who declench workflow
+
 "on":
   push:
-    branches:
-      - main
-  # programmate time of workflow execution
   schedule:
-    - cron: '0 0 * * *'
+    - cron: "30 10 * * *"
 
-# all action in this workflow
 jobs:
-  builds:
-    # name of job
-    name: up-to-date installation system
-    # env of execution
+  build:
     runs-on: ubuntu-22.04
-
     steps:
-      - uses: actions/checkout@v3
-      - name: installation Hugo with script
-        run: cd module3_task1 && ./setup.sh
-      - name: Validate Makefile execution make build command
+      - name: Clone the repo
+        uses: actions/checkout@v3
+        with:
+          repository: ''
+
+      - name: Running the setup
+        run: ./module3_task1/setup.sh
+
+      - name: Building
+        run: cd module3_task1/ && make build
+
+      - name: Run api
+        run: cd module3_task1/ && make run
+
+      - name: Create a test post
         run: |
-          make help
-          make build
-          make run
-          make stop
-          make clean
-        working-directory: module3_task1
+          cd module3_task1/ &&
+          POST_TITLE=welcometest POST_NAME=testing make post
+
+      - name: Testing
+        run: cd module3_task1/ && make test
+
+      - name: Cleaning
+        run: cd module3_task1/ && make clean
